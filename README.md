@@ -201,7 +201,7 @@ The web build writes to `app/frontEnd/dist/` first. `scripts/sync-assets.mjs` th
 cd app/frontEnd
 npm install
 
-npm run dev        # proxies /api to http://192.168.0.1:2333; falls back to the mock if no device is found
+npm run dev        # proxy /api to the device at 192.168.0.1:2333 (mock if not found)
 npm run dev:mock   # always use the built-in mock device
 npm test           # Vitest unit tests
 npm run typecheck  # tsc -b (strict)
