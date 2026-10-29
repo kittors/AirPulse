@@ -28,9 +28,21 @@ app/src/main/assets/manifest.json
 app/src/main/assets/service-worker.js
 app/src/main/assets/node_modules/*/**
 app/src/main/assets/dictionary.json
-app/frontEnd/node_modules/*/**
-app/frontEnd/node_modules/*
+
+# AirPulse 前端：依赖、构建目录，以及由 app/frontEnd/scripts/sync-assets.mjs 同步进 assets/ 的产物
+app/frontEnd/node_modules/
+app/frontEnd/dist/
+app/src/main/assets/.airpulse-web.json
+app/src/main/assets/static/
+app/src/main/assets/icons/
+app/src/main/assets/favicon.svg
 
 # JVM 崩溃/回放日志，不应进仓库
 hs_err_pid*.log
 replay_pid*.log
+
+# 原版前端的对照备份里，打赏码 / 群二维码不进仓库（备份只为测试与查阅接口细节）
+app/frontEnd/legacy-public/img/
+
+# 本机工具配置（Claude 桌面端预览等）
+/.claude/

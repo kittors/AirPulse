@@ -1,19 +1,38 @@
 {
-    "name": "UFI-TOOLS",
-    "short_name": "UFI-TOOLS",
-    "start_url": "/",
-    "display": "standalone",
-    "orientation": "portrait",
-    "icons": [
-        {
-            "src": "/icons/icon-192.webp",
-            "sizes": "192x192",
-            "type": "image/webp"
-        },
-        {
-            "src": "/icons/icon-512.webp",
-            "sizes": "512x512",
-            "type": "image/webp"
-        }
-    ]
+  "name": "AirPulse · 空脉",
+  "short_name": "AirPulse",
+  "description": "5G 随身热点与无线射频管理面板",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f5f7",
+  "theme_color": "#f5f5f7",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }

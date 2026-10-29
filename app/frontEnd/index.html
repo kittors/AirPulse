@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="AirPulse" />
+    <meta name="application-name" content="AirPulse" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>AirPulse · 空脉</title>
+    <script>
+      // 首帧前挂上手动选择的主题与强调色，避免先闪一下浅色（见 src/lib/theme.ts）
+      try {
+        var read = function (k) {
+          var v = localStorage.getItem('airpulse:' + k)
+          return v ? JSON.parse(v) : null
+        }
+        var t = read('theme')
+        var a = read('accent')
+        var root = document.documentElement
+        if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t)
+        if (a === 'teal' || a === 'violet' || a === 'pink' || a === 'graphite') root.setAttribute('data-accent', a)
+        var l = read('locale')
+        if (l === 'en') root.setAttribute('lang', 'en')
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,872 @@
+@import 'tailwindcss';
+
+/*
+ * AirPulse · 空脉 设计系统（第三版）—— Web 端 token，逐条对应 docs/design.md。
+ *
+ * 取 Apple 系统色与层级：浅色是 #F5F5F7 的页面上放白卡片，深色是纯黑页面上放 #1C1C1E 卡片。
+ * 不用渐变字、光晕、毛玻璃、点阵：信息面板上它们只会让读数和背景糊在一起。
+ *
+ * 深色模式两条路都通：
+ *   1. 默认跟随系统（prefers-color-scheme）；
+ *   2. html[data-theme=dark|light] 手动覆盖（见 lib/theme.ts，首帧前由 index.html 内联脚本挂上）。
+ * 强调色由 html[data-accent] 切换，默认系统蓝；只影响交互色，状态色与数据色不变。
+ */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
+/*
+ * static：不管有没有被工具类用到，变量一律输出。
+ * 图表这类 SVG 直接写 var(--color-*)，不走工具类，少了 static 就会读到空值。
+ */
+@theme static {
+  /* 清掉 Tailwind 自带色板，只留规范里的颜色 */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
+  /* —— 中性层次（浅色；深色在下方覆盖） —— */
+  --color-bg: #f5f5f7;
+  --color-surface: #ffffff;
+  --color-raised: #ffffff;
+  --color-sunken: #f2f2f7;
+  --color-hover: rgb(0 0 0 / 0.04);
+  --color-pressed: rgb(0 0 0 / 0.07);
+  --color-line: rgb(60 60 67 / 0.12);
+  --color-border: rgb(60 60 67 / 0.12);
+  --color-border-strong: rgb(60 60 67 / 0.22);
+  --color-text: #1d1d1f;
+  --color-text-2: #6e6e73;
+  --color-text-3: #86868b;
+  --color-text-4: #aeaeb2;
+
+  /* —— 交互色（默认系统蓝；html[data-accent] 覆盖） —— */
+  --color-accent: #007aff;
+  --color-accent-solid: #007aff;
+  --color-accent-hover: #0068d9;
+  --color-accent-soft: rgb(0 122 255 / 0.1);
+  --color-accent-text: #0066cc;
+  --color-on-accent: #ffffff;
+
+  /* —— 状态（含义固定，永远配图标或文字） —— */
+  --color-success: #34c759;
+  --color-success-soft: rgb(52 199 89 / 0.14);
+  --color-success-text: #1e8a3a;
+  --color-warning: #ff9500;
+  --color-warning-soft: rgb(255 149 0 / 0.14);
+  --color-warning-text: #b25e00;
+  --color-danger: #ff3b30;
+  --color-danger-soft: rgb(255 59 48 / 0.12);
+  --color-danger-text: #d70015;
+  /* 危险按钮填充：白字 ≥ 4.5:1 */
+  --color-danger-solid: #d9342b;
+  --color-danger-solid-hover: #c22a22;
+  /* 色阶条里「一般」那一档 */
+  --color-yellow: #ffcc00;
+
+  /* —— 数据系列色（跟着实体走：下行永远蓝、上行永远橙；不随强调色变） —— */
+  --color-series-down: #007aff;
+  --color-series-up: #ff9500;
+
+  /* —— 控件 —— */
+  --color-thumb: #ffffff;
+  --color-scrim: rgb(0 0 0 / 0.28);
+  --color-scrollbar: rgb(0 0 0 / 0.18);
+
+  /*
+   * —— 字体 ——
+   * Apple 设备：系统 SF Pro + 苹方（大字号自动切到 Display 光学尺寸）；
+   * 其它平台：本地打包的 Inter（带 opsz 轴）+ 系统中文黑体。全部离线可用。
+   * 等宽字体只给 IMEI / MAC 这类标识串。
+   */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif;
+  --font-mono:
+    ui-monospace, 'SF Mono', 'Geist Mono Variable', 'JetBrains Mono', Menlo, Consolas, 'PingFang SC', monospace;
+
+  /* —— 字号阶梯（docs/design.md §3.2） —— */
+  --text-display: 64px;
+  --text-display--line-height: 64px;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 600;
+  --text-title: 28px;
+  --text-title--line-height: 34px;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 700;
+  --text-metric: 28px;
+  --text-metric--line-height: 32px;
+  --text-metric--letter-spacing: -0.02em;
+  --text-metric--font-weight: 600;
+  --text-headline: 15px;
+  --text-headline--line-height: 20px;
+  --text-headline--letter-spacing: -0.01em;
+  --text-headline--font-weight: 600;
+  --text-body: 15px;
+  --text-body--line-height: 22px;
+  --text-subhead: 14px;
+  --text-subhead--line-height: 20px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 500;
+  --text-caption2: 11px;
+  --text-caption2--line-height: 13px;
+  --text-caption2--font-weight: 600;
+
+  /* —— 形状 —— */
+  --radius-card: 20px;
+  --radius-inner: 14px;
+  --radius-control: 12px;
+  --radius-chip: 10px;
+
+  /* —— 动效 —— */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* 兼容旧名 */
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  /* 开关拨杆的回弹；支持 linear() 的浏览器在下面换成真弹簧曲线 */
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+
+  /* —— 断点 —— */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+}
+
+/* 真弹簧：一次轻微过冲后回落 */
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(
+      0,
+      0.009,
+      0.035 2.1%,
+      0.141 4.4%,
+      0.723 12.9%,
+      0.938 16.7%,
+      1.017 19.4%,
+      1.067,
+      1.089 24.2%,
+      1.089 26.1%,
+      1.068 29.4%,
+      1.006 35.9%,
+      0.988 39.7%,
+      0.984 43.4%,
+      0.996 55.9%,
+      1
+    );
+  }
+}
+
+/* 投影走变量：深色下整体换掉 */
+@utility shadow-card {
+  box-shadow: var(--ap-shadow-card);
+}
+@utility shadow-overlay {
+  box-shadow: var(--ap-shadow-overlay);
+}
+@utility shadow-thumb {
+  box-shadow: var(--ap-shadow-thumb);
+}
+@utility shadow-raised {
+  box-shadow: var(--ap-shadow-raised);
+}
+
+/* 读数：等宽数字 */
+@utility num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* 文字光学居中：裁掉字体上下的留白，只按大写字母高度居中（角标、按钮里的数字） */
+@utility trim-cap {
+  text-box: trim-both cap alphabetic;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --ap-shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
+    --ap-shadow-raised: 0 4px 16px -4px rgb(0 0 0 / 0.1), 0 1px 3px rgb(0 0 0 / 0.04);
+    --ap-shadow-overlay: 0 16px 48px -12px rgb(0 0 0 / 0.22), 0 0 0 0.5px rgb(0 0 0 / 0.08);
+    --ap-shadow-thumb: 0 3px 8px rgb(0 0 0 / 0.12), 0 1px 1px rgb(0 0 0 / 0.04), 0 0 0 0.5px rgb(0 0 0 / 0.04);
+
+    @variant dark {
+      color-scheme: dark;
+
+      --color-bg: #000000;
+      --color-surface: #1c1c1e;
+      --color-raised: #2c2c2e;
+      --color-sunken: #2c2c2e;
+      --color-hover: rgb(255 255 255 / 0.06);
+      --color-pressed: rgb(255 255 255 / 0.1);
+      --color-line: rgb(255 255 255 / 0.09);
+      --color-border: rgb(255 255 255 / 0.09);
+      --color-border-strong: rgb(255 255 255 / 0.18);
+      --color-text: #f5f5f7;
+      --color-text-2: #a1a1a6;
+      --color-text-3: #7c7c80;
+      --color-text-4: #545458;
+
+      --color-accent: #0a84ff;
+      --color-accent-solid: #0a84ff;
+      --color-accent-hover: #3395ff;
+      --color-accent-soft: rgb(10 132 255 / 0.2);
+      --color-accent-text: #4da3ff;
+      --color-on-accent: #ffffff;
+
+      --color-success: #30d158;
+      --color-success-soft: rgb(48 209 88 / 0.18);
+      --color-success-text: #4ade80;
+      --color-warning: #ff9f0a;
+      --color-warning-soft: rgb(255 159 10 / 0.18);
+      --color-warning-text: #ffb340;
+      --color-danger: #ff453a;
+      --color-danger-soft: rgb(255 69 58 / 0.18);
+      --color-danger-text: #ff6961;
+      --color-danger-solid: #d9342b;
+      --color-danger-solid-hover: #e5453b;
+      --color-yellow: #ffd60a;
+
+      --color-series-down: #0a84ff;
+      --color-series-up: #ff9f0a;
+
+      --color-thumb: #636366;
+      --color-scrim: rgb(0 0 0 / 0.6);
+      --color-scrollbar: rgb(255 255 255 / 0.2);
+
+      --ap-shadow-card: none;
+      --ap-shadow-raised: 0 8px 24px -8px rgb(0 0 0 / 0.6);
+      --ap-shadow-overlay: 0 20px 60px -12px rgb(0 0 0 / 0.8), 0 0 0 0.5px rgb(255 255 255 / 0.1);
+      --ap-shadow-thumb: 0 3px 8px rgb(0 0 0 / 0.3), 0 1px 1px rgb(0 0 0 / 0.16);
+    }
+  }
+
+  /* —— 强调色（只影响交互色） —— */
+  :root[data-accent='teal'] {
+    --color-accent: #0a9bb5;
+    --color-accent-solid: #0a9bb5;
+    --color-accent-hover: #088aa1;
+    --color-accent-soft: rgb(10 155 181 / 0.12);
+    --color-accent-text: #077c91;
+    @variant dark {
+      --color-accent: #40c8e0;
+      --color-accent-solid: #1fa8c2;
+      --color-accent-hover: #2fb8d1;
+      --color-accent-soft: rgb(64 200 224 / 0.18);
+      --color-accent-text: #6fd6e8;
+    }
+  }
+  :root[data-accent='violet'] {
+    --color-accent: #9b4fd1;
+    --color-accent-solid: #9b4fd1;
+    --color-accent-hover: #8a42bd;
+    --color-accent-soft: rgb(155 79 209 / 0.12);
+    --color-accent-text: #8440b3;
+    @variant dark {
+      --color-accent: #bf5af2;
+      --color-accent-solid: #a64ad6;
+      --color-accent-hover: #b45ce3;
+      --color-accent-soft: rgb(191 90 242 / 0.2);
+      --color-accent-text: #d18cf7;
+    }
+  }
+  :root[data-accent='pink'] {
+    --color-accent: #e8355d;
+    --color-accent-solid: #e8355d;
+    --color-accent-hover: #d42a50;
+    --color-accent-soft: rgb(232 53 93 / 0.1);
+    --color-accent-text: #c4234a;
+    @variant dark {
+      --color-accent: #ff375f;
+      --color-accent-solid: #e8355d;
+      --color-accent-hover: #f5466c;
+      --color-accent-soft: rgb(255 55 95 / 0.18);
+      --color-accent-text: #ff6b88;
+    }
+  }
+  /* 石墨：无彩色，深色下按钮反白 */
+  :root[data-accent='graphite'] {
+    --color-accent: #3a3a3c;
+    --color-accent-solid: #1d1d1f;
+    --color-accent-hover: #3a3a3c;
+    --color-accent-soft: rgb(60 60 67 / 0.1);
+    --color-accent-text: #1d1d1f;
+    --color-on-accent: #ffffff;
+    @variant dark {
+      --color-accent: #d1d1d6;
+      --color-accent-solid: #f5f5f7;
+      --color-accent-hover: #ffffff;
+      --color-accent-soft: rgb(255 255 255 / 0.12);
+      --color-accent-text: #f5f5f7;
+      --color-on-accent: #1d1d1f;
+    }
+  }
+
+  /* Tailwind v4 的默认边框色是 currentColor，改回 token */
+  *,
+  ::after,
+  ::before,
+  ::backdrop {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background-color: var(--color-bg);
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    font-optical-sizing: auto;
+    /* 多行说明文字避免最后一行只剩一两个字（不支持的浏览器忽略） */
+    text-wrap-style: pretty;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+
+  /* 键盘焦点环：只在键盘导航时出现；输入框由容器自己画光环 */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-accent) 24%, transparent);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-text-4);
+    opacity: 1;
+  }
+
+  /* —— 去掉一切浏览器原生输入外观 —— */
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-text);
+    caret-color: var(--color-text);
+    box-shadow: 0 0 0 1000px var(--color-sunken) inset;
+    transition: background-color 9999s ease-out;
+  }
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
+  /* —— 自定义滚动条：细、圆、悬停才变深 —— */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar);
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-4);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 动效
+ *
+ * 位移一律用独立的 translate / scale 属性而不是 transform：Tailwind v4 的
+ * -translate-x-1/2 生成的也是独立属性，两者会叠加；keyframes 里写 transform
+ * 会和居中用的 translate 打架。
+ * ------------------------------------------------------------------------- */
+
+@keyframes ap-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ap-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ap-pop-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes ap-pop-out {
+  to {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+@keyframes ap-sheet-in-right {
+  from {
+    translate: 100% 0;
+  }
+}
+@keyframes ap-sheet-out-right {
+  to {
+    translate: 100% 0;
+  }
+}
+@keyframes ap-sheet-in-up {
+  from {
+    translate: 0 100%;
+  }
+}
+@keyframes ap-sheet-out-down {
+  to {
+    translate: 0 100%;
+  }
+}
+@keyframes ap-toast-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--ap-toast-from, -12px);
+    scale: 0.96;
+  }
+}
+@keyframes ap-toast-swipe-out {
+  from {
+    translate: 0 var(--radix-toast-swipe-end-y, 0px);
+  }
+  to {
+    opacity: 0;
+    translate: 0 calc(var(--radix-toast-swipe-end-y, 0px) - 48px);
+  }
+}
+/* 实时状态点：外圈扩散，2.4s 一个循环 */
+@keyframes ap-breathe {
+  0% {
+    opacity: 0.5;
+    scale: 1;
+  }
+  70%,
+  100% {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+@keyframes ap-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+@keyframes ap-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+/* 角标数字变化：轻轻弹一下 */
+@keyframes ap-bump {
+  0% {
+    scale: 1;
+  }
+  40% {
+    scale: 1.18;
+  }
+  100% {
+    scale: 1;
+  }
+}
+/* 逐位滚动的数字（RollingNumber）：变大往上滚，变小往下滚 */
+@keyframes ap-roll-in-up {
+  from {
+    opacity: 0;
+    translate: 0 62%;
+  }
+}
+@keyframes ap-roll-out-up {
+  to {
+    opacity: 0;
+    translate: 0 -62%;
+  }
+}
+@keyframes ap-roll-in-down {
+  from {
+    opacity: 0;
+    translate: 0 -62%;
+  }
+}
+@keyframes ap-roll-out-down {
+  to {
+    opacity: 0;
+    translate: 0 62%;
+  }
+}
+
+/* —— 切页过渡（View Transitions，见 app/transition.ts） ——
+ * 名字只在切页 / 切分区的那一次过渡里起（:root[data-nav-level]），主题切换的圆形揭开只有根层参与，互不干扰。
+ * 内容区（切整页时是 .ap-page，切分区时是 .ap-section）按路由命名：旧的退场、新的进场，各自在原位动画，
+ * 不会整块上下平移。根层、顶栏、标签栏、通知不做交叉淡化，直接显示新状态；
+ * 顶栏、标签栏、通知的快照要压在内容上面——新内容是后加进来的一层，默认会画在最上面把它们盖住。
+ * 节奏是「先淡出、再滑入」（Material fade through 加一点横移）：旧内容 100 ms 内淡出并往反方向退一点，
+ * 新内容在它快退完时（80 ms）从导航方向滑入，减速归位，合计约 340 ms。
+ * 两者只交叠一帧左右：不会出现整段重影，也不会有一帧整片空白（大屏上会像闪了一下）。 */
+:root[data-nav-level='page'] .ap-page,
+:root[data-nav-level='section'] .ap-section {
+  view-transition-name: var(--ap-vt);
+}
+:root[data-nav-level] .ap-vt-topbar {
+  view-transition-name: ap-topbar;
+}
+:root[data-nav-level] .ap-vt-tabbar {
+  view-transition-name: ap-tabbar;
+}
+:root[data-nav-level] .ap-vt-toasts {
+  view-transition-name: ap-toasts;
+}
+:root[data-nav-level]::view-transition-old(*) {
+  animation: ap-view-out 100ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+:root[data-nav-level]::view-transition-new(*) {
+  animation: ap-view-in 260ms 80ms cubic-bezier(0.05, 0.7, 0.1, 1) both;
+}
+:root[data-nav-level]::view-transition-old(root),
+:root[data-nav-level]::view-transition-old(ap-topbar),
+:root[data-nav-level]::view-transition-old(ap-tabbar),
+:root[data-nav-level]::view-transition-old(ap-toasts) {
+  display: none;
+}
+:root[data-nav-level]::view-transition-new(root),
+:root[data-nav-level]::view-transition-new(ap-topbar),
+:root[data-nav-level]::view-transition-new(ap-tabbar),
+:root[data-nav-level]::view-transition-new(ap-toasts) {
+  animation: none;
+}
+:root[data-nav-level]::view-transition-group(ap-topbar),
+:root[data-nav-level]::view-transition-group(ap-tabbar) {
+  z-index: 1;
+}
+:root[data-nav-level]::view-transition-group(ap-toasts) {
+  z-index: 2;
+}
+@keyframes ap-view-out {
+  to {
+    opacity: 0;
+    translate: calc(var(--ap-nav-dir, 1) * -12px) 0;
+  }
+}
+@keyframes ap-view-in {
+  from {
+    opacity: 0;
+    translate: calc(var(--ap-nav-dir, 1) * 24px) 0;
+  }
+}
+/* 不支持 View Transitions 的浏览器：新内容挂载时自己滑入（旧内容直接换掉） */
+@supports not (view-transition-name: none) {
+  :root[data-nav-level='page'] .ap-page,
+  :root[data-nav-level='section'] .ap-section {
+    animation: ap-view-in 260ms cubic-bezier(0.05, 0.7, 0.1, 1) both;
+  }
+}
+.ap-spin {
+  animation: ap-spin 0.8s linear infinite;
+}
+.ap-bump {
+  animation: ap-bump 320ms var(--ease-out);
+}
+
+/*
+ * 逐位滚动：每一位一个格子。用 clip-path 而不是 overflow:hidden 裁掉滑出去的字符——
+ * inline-block 一旦 overflow:hidden，基线就掉到盒子底边，数字会和旁边的单位对不齐。
+ */
+.ap-roll-slot {
+  position: relative;
+  display: inline-block;
+  clip-path: inset(0 -0.15em);
+}
+.ap-roll-slot > span {
+  display: inline-block;
+}
+.ap-roll-in-up {
+  animation: ap-roll-in-up 300ms var(--ease-out) both;
+}
+.ap-roll-in-down {
+  animation: ap-roll-in-down 300ms var(--ease-out) both;
+}
+.ap-roll-out-up,
+.ap-roll-out-down {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ap-roll-out-up {
+  animation: ap-roll-out-up 300ms var(--ease-out) forwards;
+}
+.ap-roll-out-down {
+  animation: ap-roll-out-down 300ms var(--ease-out) forwards;
+}
+
+/* 可按压元素：按下缩到 0.97，松手回弹 */
+.ap-press {
+  transition:
+    scale 360ms var(--ease-spring),
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+.ap-press:not(:disabled):active {
+  scale: 0.97;
+  transition-duration: 80ms;
+}
+/* 大块的可点区域（模块卡片）缩得更少，免得整块晃 */
+.ap-press-soft:not(:disabled):active {
+  scale: 0.985;
+}
+
+/* 呼吸点：只用在「实时」这一处语义上 */
+.ap-live-dot {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+.ap-live-dot[data-breathing='true']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: ap-breathe 2.4s var(--ease-out) infinite;
+}
+
+/* 骨架屏 */
+.ap-skeleton {
+  border-radius: 8px;
+  background: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--color-surface) 60%, transparent) 50%, transparent 100%)
+    var(--color-sunken);
+  background-size: 200% 100%;
+  animation: ap-shimmer 1.6s var(--ease-in-out) infinite;
+}
+
+/* 浮层：遮罩 / 弹窗 / 抽屉 / 菜单 / 提示 */
+.ap-scrim[data-state='open'] {
+  animation: ap-fade-in var(--duration-base) var(--ease-out);
+}
+.ap-scrim[data-state='closed'] {
+  animation: ap-fade-out 160ms var(--ease-exit) forwards;
+}
+.ap-popover {
+  transform-origin: var(--radix-popper-transform-origin);
+}
+.ap-popover[data-state='open'],
+.ap-popover[data-state='delayed-open'],
+.ap-popover[data-state='instant-open'] {
+  animation: ap-pop-in 160ms var(--ease-out);
+}
+.ap-popover[data-state='closed'] {
+  animation:
+    ap-pop-out 100ms var(--ease-exit) forwards,
+    ap-fade-out 100ms var(--ease-exit) forwards;
+}
+.ap-toast[data-state='open'] {
+  animation: ap-toast-in var(--duration-slow) var(--ease-out);
+}
+.ap-toast[data-state='closed'] {
+  animation: ap-fade-out 160ms var(--ease-exit) forwards;
+}
+/* 往上划掉（Provider 的 swipeDirection="up"）：手指跟着走；页面不能把这次滑动当成滚动抢走 */
+.ap-toast {
+  touch-action: none;
+}
+.ap-toast[data-swipe='move'] {
+  translate: 0 var(--radix-toast-swipe-move-y);
+}
+.ap-toast[data-swipe='cancel'] {
+  translate: 0 0;
+  transition: translate var(--duration-base) var(--ease-out);
+}
+.ap-toast[data-swipe='end'] {
+  animation: ap-toast-swipe-out 160ms var(--ease-exit) forwards;
+}
+
+/* 隐藏滚动条但保留滚动 */
+.ap-no-scrollbar {
+  scrollbar-width: none;
+}
+.ap-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.ap-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+/* 主题切换：交给 View Transitions，新主题从点击处以圆形展开（见 preferences.tsx） */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 移动端底部标签栏的高度（AppShell 挂载时给 html 加 ap-has-tabbar），通知浮层据此让开 */
+@media (width < 64rem) {
+  :root.ap-has-tabbar {
+    --ap-tabbar-h: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
+/* 尊重「减弱动态效果」：去掉位移与缩放，只保留透明度 */
+@media (prefers-reduced-motion: reduce) {
+  /* 切页只淡入淡出，不横移 */
+  @keyframes ap-view-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-view-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-pop-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-pop-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-sheet-in-right {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-sheet-out-right {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-sheet-in-up {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-sheet-out-down {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-toast-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-roll-in-up {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-roll-in-down {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-roll-out-up {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-roll-out-down {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ap-bump {
+    to {
+      scale: 1;
+    }
+  }
+  @keyframes ap-breathe {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  .ap-press:not(:disabled):active {
+    scale: none;
+  }
+  .ap-motion-safe-transition {
+    transition: none !important;
+  }
+  .ap-skeleton {
+    animation: none;
+  }
+}
