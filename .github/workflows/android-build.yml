@@ -1,11 +1,13 @@
-name: Android Release CI
+name: Android CI
 
 on:
   push:
-    branches: [ "http-server-version" ]
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
-  build-release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,17 +21,30 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
+          cache-dependency-path: app/frontEnd/package-lock.json
 
-      - name: Install Node.js dependencies
+      - name: Install web dependencies
         working-directory: app/frontEnd
-        run: npm install --no-package-lock
+        run: npm ci
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Test web app
+        working-directory: app/frontEnd
+        run: npm test
 
-      - name: Build with tag version
-        run: ./gradlew assembleDebug
+      # Gradle's npmBuild task runs `npm run build` (type-check, bundle, sync into assets) first
+      - name: Build APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AirPulse-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

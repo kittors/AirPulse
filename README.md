@@ -1,179 +1,263 @@
-# 🧰 UFI-TOOLS
+<div align="center">
 
-> 一款面向某兴随身WIFI（F50/U30 Air）的多功能管理与扩展工具  
-> 支持远程管理、信号监控、系统控制、插件扩展等丰富功能  
-> 同时也提供其他某兴展锐Android手机/平板支持
+<img src="app/frontEnd/public/favicon.svg" width="88" height="88" alt="AirPulse icon" />
 
-**[UFI-TOOLS使用说明](https://github.com/kanoqwq/UFI-TOOLS/blob/http-server-version/User_Doc.md)**
+# AirPulse
 
-F50 / U30Air 通用安装教程：[📺 B站视频](https://www.bilibili.com/video/BV1qUHpzeEDd)  
-Magisk 模块版本（畅行60 / 云电脑）安装教程：[📺 B站视频](https://www.bilibili.com/video/BV1nsW4zpE1T)
+**A modern, offline-first control panel for ZTE F50 and U30 Air 5G pocket Wi-Fi.**
 
----
+Live speed and signal, band and cell lock, Wi-Fi and connected devices, SMS forwarding, an AT console and more.
+It runs on the hotspot itself at `http://192.168.0.1:2333`.
 
-## Star History
+[![Android CI](https://github.com/kittors/AirPulse/actions/workflows/android-build.yml/badge.svg)](https://github.com/kittors/AirPulse/actions/workflows/android-build.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0a84ff)](LICENCE)
+![React 19](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![Vite 6](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)
 
-<a href="https://star-history.dera.page/#kanoqwq/UFI-TOOLS&type=date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=kanoqwq/UFI-TOOLS&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=kanoqwq/UFI-TOOLS&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=kanoqwq/UFI-TOOLS&type=date&legend=top-left" />
- </picture>
-</a>
+[Features](#features) · [Screenshots](#screenshots) · [Install](#install-on-the-device) · [Build](#build-from-source) · [Develop](#frontend-development) · [Credits](#credits)
 
----
+</div>
 
-## 🧩 版本区分
+<br />
 
-UFI-TOOLS 提供 **Pocket Edition（PE版）** 与 **完整版本** 两种使用形态，满足不同场景需求：
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/overview-dark.png" />
+  <img alt="AirPulse overview: live speed, signal, quick controls, data usage and the serving cell" src="docs/screenshots/overview-light.png" />
+</picture>
 
-| 版本类型 | 部署方式 | 适用设备 | 功能支持 | 典型用途 |
-|-----------|-----------|-----------|-----------|-----------|
-| 📱 **[Pocket Edition (PE版)](https://github.com/kanoqwq/UFI-TOOLS/tree/main)** | 仅需安装在手机上 | 手机端连接MIFI/UFI设备 | ⭐ 精简功能集<br>🚫 无需安装到随身WiFi<br>⚙️ 可远程控制随身WiFi | 手机控制随身WiFi设备，轻量远程管理 |
-| 💻 **[完整版 (Full)](https://github.com/kanoqwq/UFI-TOOLS/tree/http-server-version)** | 安装在目标设备（随身WiFi / 平板 / 路由） | 随身WIFI（U30 Air/F50 等） | 🌟 全功能支持<br>🧠 插件商店完整可用<br>🔐 可开启高级功能 | 深度系统管理与插件扩展，完全控制目标机器 |
+<p align="center"><sub>All screenshots come from the built-in mock device, so the numbers, messages and identifiers are made up.</sub></p>
 
-> 💡 PE版适合普通用户快速使用；完整版为进阶用户或发烧友设计。
+## Why AirPulse
 
-> 💡 如何知道自己的设备是否支持UFI-TOOLS？
->
-> - 只要你是某兴随身WiFi，紫光平台，Android系统，就可以尝试使用UFI-TOOLS进行设备管理。
-> - 直接下载PE版本连接设备进行尝试。
+The F50 and U30 Air are capable 5G hotspots, but the stock web page hides most of what the modem can do.
+The community project [UFI-TOOLS](https://github.com/kanoqwq/UFI-TOOLS) unlocked those features with an on-device service.
+Over time its web page grew dense and hard to read.
 
----
+AirPulse keeps the UFI-TOOLS service and replaces its entire web console with a new app, rebuilt from scratch.
+It starts from one question: *how is my connection right now, and what can I do about it?*
 
-## 📘 项目简介
+- **Numbers come first.** Speed, RSRP, SINR, RSRQ, band, PCI and EARFCN use large tabular figures that don't jump as they update. Each signal reading gets a plain-language rating.
+- **Controls sit next to what they change.** Lock a band on the Radio page, lock a cell from the nearby-cells list, and flip Wi-Fi, IPv6 or performance mode from the overview.
+- **Nothing happens by surprise.** Anything that can cut your connection asks first and explains what will happen. Switches wait until the device has applied the change before they settle.
+- **It works without internet.** Fonts, icons and scripts are bundled into the APK, so the panel opens even when the SIM has no service. That is exactly when you need to change the network mode or unlock a band.
+- **It suits any screen.** Laptops get a multi-column dashboard, phones get one column with a tab bar, and both have light and dark themes.
 
-**UFI-TOOLS** 是为 **zxe（某兴）+ 展锐 / 紫光平台设备** 打造的全能系统管理与扩展框架。  
-支持在 **便携路由器、手机、平板** 等多种设备上运行，可通过 **Web UI / APK / Magisk 模块** 等方式部署。
+## Features
 
-- ✅ 适配设备：zxe F50、U30 Air、畅行60、远航60系列、某兴云电脑平板等  
-- 🧩 模块化插件系统  
-- 🌐 支持远程网页控制与设备集群管理  
-- ⚙️ 可作为后台服务运行，支持开机自启  
+<table>
+<tr>
+<td width="50%" valign="top">
 
----
+### Overview
+- Carrier, network type (5G SA, 5G NSA or LTE) and connection time
+- Live download and upload speed with a 60-second chart
+- RSRP with a quality rating and 1-minute trend, plus SINR and RSRQ
+- **Quick controls**: mobile data, Wi-Fi, performance mode, IPv6 and network mode, one tap each
+- Monthly data usage against your plan, connected devices, temperature, power, CPU and memory
+- Latest SMS, with one-tap copy for verification codes
+- Serving cell (band, frequency, bandwidth, PCI, EARFCN, cell ID) and device details
 
-## ⚙️ 核心功能模块
+</td>
+<td width="50%" valign="top">
 
-### 🔧 系统与设备控制
-- 一键开启高级功能，获取系统最高权限（Root 级控制）  
-- **性能模式切换 / CPU 核心控制 / 电池定量停充**  
-- **USB 调试自动启用** 与 **网络 USB 调试自动启动**  
-- 支持 **文件共享 / 指示灯控制 / OTA 更新**  
-- 支持 **开机自启脚本与后台服务**  
+### Radio
+- Network mode: 5G/4G/3G automatic, 5G NSA, 5G SA only, 4G/3G, 4G only or 3G only. Modes that can leave you without service warn first.
+- **Band lock** with 5G NR and LTE band chips grouped by low, mid and high band
+- **Nearby cells** with signal bars, RSRQ and SINR. Tap a row to lock that cell (PCI + EARFCN), lock one by hand, or remove all cell locks.
 
----
+</td>
+</tr>
+<tr>
+<td valign="top">
 
-### 📶 网络与信号管理
-- **免重启锁频段 / 锁小区**（即时生效）  
-- 支持 **3G / 4G / 5G 网络模式切换**  
-- 实时监测：RSRP、SINR、PCI、Band、QCI、SNR、QoS、IPv6 等信号、频段，速率等指标  
-- **内网测速** 与实时速率图表可视化  
+### Hotspot
+- Wi-Fi on and off, and switching between 2.4 GHz and 5 GHz
+- Network name, security, password, hidden network and device limit
+- A QR code for joining from a phone
+- Turning Wi-Fi off when idle
+- Connected devices with type icons and Wi-Fi or USB link. Rename, block and unblock them.
 
----
+</td>
+<td valign="top">
 
-### 💬 通信与命令功能
-- 短信发送、接收与 **自动转发**  
-- 内置 **AT 命令终端**（支持自定义命令交互）  
-- 支持 **远程 SSH 管理** 与命令行访问（需开启高级功能）  
-- 提供轻量 **Web 控制台**，支持局域网 / 穿透远控  
+### Messages
+- Conversation-style inbox with search, compose and delete
+- **SMS forwarding** to Email (SMTP), DingTalk, Bark, Telegram, WeCom, Feishu/Lark, PushPlus, ServerChan, ntfy, Gotify, any webhook or your own curl command
+- Sender and keyword filters, test messages, and power and data-cap alerts
 
----
+</td>
+</tr>
+<tr>
+<td valign="top">
 
-### 🧩 插件商店系统
-UFI-TOOLS 内置 **插件商店**，可在线下载、安装多种功能插件。  
-插件服务器已收录常用组件，涵盖系统扩展、AI、网络、自动化等领域：
+### Tools
+- **AT console** with common queries, decoded QoS (QCI and subscribed rates), history, a SIM picker and guards for risky commands
+- Embedded root web terminal (ttyd)
+- Speed tests: LAN throughput (uses no cellular data), cellular download with a choice of servers, and iperf3 commands
+- Scheduled tasks
+- Advanced features: root access, USB or wireless ADB, SMB file sharing, port protection, boot script, custom code, boot-partition backup and file uploads
+- **Update** AirPulse by uploading a new APK from the browser
 
-| 类别 | 插件名称 | 功能说明 |
-|------|-----------|-----------|
-| 🛡️ 系统安全 | ADGuardHome | 广告过滤、DNS 管理 |
-| 📊 状态监控 | 流量状态卡片 | 实时显示设备流量与速率 |
-| 🤖 智能应用 | AI 看板 | 智能监控信息展示 |
-| 🔑 远程访问 | SSH 工具 | 提供远程命令行访问入口 |
-| ⚙️ 系统控制 | CPU 核心控制 | 动态管理核心启停 |
-| 🎨 外观自定义 | 主题布局编辑 | 自定义界面主题与排版 |
-| 🔋 电源管理 | 电池定量停充 | 延长电池寿命，智能控制充电阈值 |
-| 🏫 网络支持 | EasyConnect | 校园网 VPN 支持 |
-| ⏰ 自动化 | Crontab 定时任务 | 定时推送与脚本任务 |
-| 🌐 远程互联 | EasyTier 异地组网 | 多设备跨地域组网互通 |
+</td>
+<td valign="top">
 
-> 🔓 插件系统模块化设计，以上仅展示部分插件，未来将持续扩展更多功能。
+### Settings
+- **Network**: mobile data, roaming, **IPv6 on/off**, VoLTE, VoNR, high-speed rail mode, USB networking mode (RNDIS / CDC-ECM), SIM slot and APN profiles
+- **Data**: usage history, data plan and alert level, usage calibration, and a data guard that cuts mobile data at a cap
+- **LAN**: gateway address and DHCP range
+- **Device**: name, status light, **performance mode**, scheduled restart, admin password, restart or shut down, and blocking system updates (FOTA)
+- **General**: theme (light, dark or system), five accent colors, language (English or 简体中文) and access token
 
----
+</td>
+</tr>
+</table>
 
-### 🧠 高级功能
-开启“高级功能”后可解锁系统特权功能：
-- 获取设备最高系统权限  
-- 访问隐藏接口与底层管理模块  
-- 解锁全部插件商店插件  
-- 启用极速更新通道（更新零等待）  
-- 支持远程SSH访问、文件推送、系统级调试  
+> [!NOTE]
+> **How the IPv6 switch works.** ZTE's firmware has no IPv6 switch. IPv6 follows the IP type of the active APN.
+> AirPulse handles this for you. It sets the APN to *IPv4* or *IPv4v6*. If the APN is chosen automatically, AirPulse first creates a manual IPv4 copy of the carrier's profile. It then waits for the redial and shows whether the carrier actually assigned an IPv6 address.
 
----
+## Screenshots
 
-### 📱 平台兼容性
-支持以下设备及运行方式：
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/radio-light.png" alt="Radio page" /><p align="center"><sub><b>Radio</b>: network mode, band lock and nearby cells</sub></p></td>
+<td width="50%"><img src="docs/screenshots/hotspot-dark.png" alt="Hotspot page in dark mode" /><p align="center"><sub><b>Hotspot</b>: Wi-Fi, join QR code and connected devices</sub></p></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/settings-network-light.png" alt="Network settings" /><p align="center"><sub><b>Settings › Network</b>: data, IPv6, VoLTE/VoNR, USB mode and APNs</sub></p></td>
+<td><img src="docs/screenshots/forward-light.png" alt="SMS forwarding settings" /><p align="center"><sub><b>Messages › Forwarding</b>: 12 channels, filters and alerts</sub></p></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/tools-at-light.png" alt="AT command console" /><p align="center"><sub><b>Tools › AT commands</b>: presets, decoded results and history</sub></p></td>
+<td><img src="docs/screenshots/tools-advanced-dark.png" alt="Advanced tools in dark mode" /><p align="center"><sub><b>Tools › Advanced</b>: root, ADB, SMB and port protection</sub></p></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/radio-dark.png" alt="Radio page in dark mode" /><p align="center"><sub><b>Radio</b> in dark mode</sub></p></td>
+<td><img src="docs/screenshots/hotspot-light.png" alt="Hotspot page in light mode" /><p align="center"><sub><b>Hotspot</b> in light mode</sub></p></td>
+</tr>
+</table>
 
-- 📲 **Magisk 模块安装** (适合手机/平板)
-- 💻 **一键安装 / 投屏安装** （推荐，适合随身WiFi）   
+### On a phone
 
-**适配机型：**
+<p align="center">
+  <img src="docs/screenshots/m-overview-light.png" width="19%" alt="Overview on a phone" />
+  <img src="docs/screenshots/m-overview-dark.png" width="19%" alt="Overview on a phone, dark mode" />
+  <img src="docs/screenshots/m-radio-dark.png" width="19%" alt="Radio on a phone, dark mode" />
+  <img src="docs/screenshots/m-hotspot-light.png" width="19%" alt="Hotspot on a phone" />
+  <img src="docs/screenshots/m-messages-light.png" width="19%" alt="Messages on a phone" />
+</p>
 
-- 某兴畅行60 / 远航60 / 畅行60Plus  
-- 某兴云电脑平板（W200DS系列）  
-- F50、U30 Air  
-- 以及其他紫光 CPU + 某兴 MyOS 13 系统设备（理论兼容）  
+## Install on the device
 
----
+AirPulse is a single Android APK. Its package name is `com.minikano.f50_sms`, the same as UFI-TOOLS. It runs a small web server on port **2333** and serves the AirPulse web app from its own assets.
 
-### 🌐 远程管理与网页控制
-- 内置轻量级 Web Server，可通过浏览器访问控制界面  
-- 支持：
-  - 设备状态卡片  
-  - 实时性能监控  
-  - 插件商店  
-  - 网络控制与调试  
-- 默认访问地址：`http://设备IP:2333`  
+**Supported devices:** ZTE F50 and U30 Air on Unisoc firmware. Other ZTE Unisoc devices that run UFI-TOOLS may also work.
 
----
+### First install
 
-## 🌟 项目特点与优势
-- 🧩 模块化设计：核心 + 插件架构，灵活扩展  
-- ⚡ 免重启锁频段 / 锁小区：调试更高效  
-- 📈 实时可视化监控：信号、CPU、温度、内存、速率  
-- 🔐 高级功能：一键获取系统权限、为极客用户定制提供专属功能
-- 🧠 多平台支持：手机 / 平板 / 随身WiFi 全面兼容  
-- 🔄 极速更新机制：自动保持最新版本  
-- 🖥️ 双端控制：浏览器操作支持移动端与PC端  
-- ☁️ 异地组网：通过 EasyTier 轻松实现远程互联  
+1. Connect the hotspot to your computer and turn on ADB (USB debugging) on the device. How you do this depends on the firmware; the [UFI-TOOLS install guide](User_Doc.md#3-安装与首次使用) and its [video tutorial](https://www.bilibili.com/video/BV1qUHpzeEDd) (both in Chinese) cover the common cases.
+2. Install the APK. Either [build it](#build-from-source) or download one from [Actions](https://github.com/kittors/AirPulse/actions/workflows/android-build.yml) (`app-debug.apk` under *Artifacts*):
+   ```bash
+   adb install -r app-debug.apk
+   ```
+3. Open the app once on the device (for example through [scrcpy](https://github.com/Genymobile/scrcpy)). Allow notifications and turn off battery optimization so the service keeps running.
+4. Open **<http://192.168.0.1:2333>** in a browser and sign in:
+   - **Token**: the AirPulse access token, `admin` by default. AirPulse reminds you to change it until you do.
+   - **Password**: the device's own admin password, as used by `192.168.0.1:8080`. It is printed on the device label and is often `admin`.
 
----
+<p align="center"><img src="docs/screenshots/login-light.png" width="420" alt="AirPulse sign-in page" /></p>
 
-## ⚠️ 注意事项
-- 部分功能依赖于具体设备型号或系统版本。  
-- 插件商店部分插件需启用「高级功能」后才能使用。  
-- 使用高级功能前，请备份重要数据。  
-- 项目测试环境：  
-  `U30Air_SSVB14 / MU300_ZYV1.0.0B09 / 畅行60（Rooted） / 畅行60Plus（Rooted） / 远航60（Rooted） / 云电脑平板（Rooted）`  
+### Updating
 
----
+- **From AirPulse:** go to *Tools › Update* and upload the new APK. The service installs it and reconnects by itself.
+- **From UFI-TOOLS:** AirPulse is a drop-in replacement because it is the same package. Android refuses an update signed with a different key, though. If your installed copy came from elsewhere, uninstall it first (`adb uninstall com.minikano.f50_sms`). This resets the service's own settings, such as the access token, forwarding rules and scheduled tasks.
 
-## 📜 开源协议
-本项目遵循 **MIT License**  
-可自由使用、修改与分发，但请保留作者署名。
+## Build from source
 
-欢迎提交 Issue / Pull Request 一起完善项目 💡  
+**Requirements:** Node.js 20+, JDK 17 and the Android SDK (platform 35).
 
-> 本项目完全开源免费，如果你喜欢这个项目的话，也可以请我喝一杯咖啡~
->
-> | ![ali_pay](./images/ali_pay.jpeg) | ![wechat_pay](./images/zsm.png) |
-> | ------------------------------- | ------------------------------- |
->
+```bash
+git clone https://github.com/kittors/AirPulse.git
+cd AirPulse
 
-> 欢迎加入群聊一起讨论！
-> TG：[t.me/ufi_tools_chat](https://github.com/kanoqwq/UFI-TOOLS/tree/http-server-version)
->
-> | ![group2](./images/group_2.jpg) | ![group3](./images/group_3.jpg) |
-> | ------------------------------- | ------------------------------- |
->
+# Web app: type-check, bundle, then sync into app/src/main/assets
+cd app/frontEnd
+npm ci
+npm run build
+cd ../..
 
+# APK (also runs the web build above)
+./gradlew assembleDebug
+# → app/build/outputs/apk/debug/app-debug.apk
+```
+
+The web build writes to `app/frontEnd/dist/` first. `scripts/sync-assets.mjs` then copies it into `app/src/main/assets/`. The sync only replaces files it wrote last time; the backend's `shell/` and `certs/` directories next to them are never touched.
+
+## Frontend development
+
+```bash
+cd app/frontEnd
+npm install
+
+npm run dev        # proxies /api to http://192.168.0.1:2333; falls back to the mock if no device is found
+npm run dev:mock   # always use the built-in mock device
+npm test           # Vitest unit tests
+npm run typecheck  # tsc -b (strict)
+```
+
+- To use a device at another address, set `AIRPULSE_DEVICE=http://<ip>:2333 npm run dev`.
+- **Mock device**: `mock/` simulates an F50 closely enough to develop every page offline. It includes live telemetry with bursty traffic, signal drift, nearby cells, SMS, forwarding channels, AT replies, the APN state machine, root and ADB tools, uploads and the update flow. It mirrors the real goform API's field names and quirks, so what works against the mock works on the device.
+- **Non-secure context**: on the device the panel is served over plain HTTP. `crypto.subtle`, `crypto.randomUUID`, the async Clipboard API and Service Workers are therefore unavailable, and the code avoids them. Request signing uses [`@noble/hashes`](https://github.com/paulmillr/noble-hashes), and copying falls back to `execCommand`.
+
+### Tech stack
+
+| Area | Choice |
+| --- | --- |
+| UI | React 19, TypeScript (strict), Vite 6 |
+| Styling | Tailwind CSS v4 with design tokens for light and dark themes |
+| Components | Radix UI primitives (Dialog, Select, Switch, Tabs, Popover, Toast…) wrapped in custom components; no native `<select>`, checkboxes or browser dialogs |
+| Data | TanStack Query: polling, optimistic updates, and waiting for the device to apply changes |
+| Motion | Motion, plus View Transitions for page changes; respects *Reduce motion* |
+| Icons and fonts | Phosphor Icons, Inter and Geist Mono, all bundled locally |
+| Backend | The UFI-TOOLS Kotlin service (Ktor, on the device), unchanged |
+
+### Project layout
+
+```text
+app/
+├── frontEnd/                 # AirPulse web app
+│   ├── src/
+│   │   ├── api/              # typed clients for /api/* and the ZTE goform API
+│   │   ├── model/            # pure parsing and planning logic (APN, telemetry, …)
+│   │   ├── features/         # overview, radio, hotspot, messages, tools, settings
+│   │   ├── components/       # UI kit (ui/) and visualizations (viz/)
+│   │   └── i18n/             # English and Simplified Chinese
+│   ├── mock/                 # mock device for development
+│   ├── tests/                # Vitest
+│   ├── docs/                 # design system and notes on the original API (Chinese)
+│   └── scripts/sync-assets.mjs
+└── src/main/                 # Android app: Ktor service, shell tools, assets
+API_Doc.md                    # backend API reference (Chinese)
+docs/screenshots/             # images used in this README
+```
+
+## Security notes
+
+- **Change the default access token.** Anyone on your Wi-Fi or USB network can otherwise sign in.
+- The panel is meant for your local network. Don't forward port 2333 (or the web-terminal port 1146 and ADB port 5555) to the internet. *Tools › Advanced › Port protection* can close the terminal and ADB ports when you don't need them.
+- *Advanced features* give the service root access to the device. Only turn them on if you understand what that means.
+- "Remember me" stores only hashes in the browser, never the plain token or password.
+
+## Credits
+
+AirPulse is built on **[UFI-TOOLS](https://github.com/kanoqwq/UFI-TOOLS)** by **[MiniKano](https://github.com/kanoqwq)**. That project provides the on-device service, the device integration and many of the features exposed here. Please consider starring and supporting the original project.
+
+AirPulse also uses [React](https://react.dev), [Vite](https://vite.dev), [Tailwind CSS](https://tailwindcss.com), [Radix UI](https://www.radix-ui.com), [TanStack Query](https://tanstack.com/query), [Motion](https://motion.dev), [Phosphor Icons](https://phosphoricons.com), [Inter](https://rsms.me/inter/), [Geist Mono](https://vercel.com/font), [noble-hashes](https://github.com/paulmillr/noble-hashes) and [uqr](https://github.com/unjs/uqr).
+
+## License
+
+[MIT](LICENCE). Original UFI-TOOLS © 2025 MiniKano; AirPulse web console © 2026 kittors.
+
+AirPulse is an independent community project. It is not affiliated with or endorsed by ZTE or any carrier. Changing radio settings can break connectivity or go against your carrier's terms, so use it at your own risk.
